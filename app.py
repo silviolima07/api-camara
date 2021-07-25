@@ -95,7 +95,7 @@ def main():
     
     dados_abertos  = Image.open("Images/dados_abertos.jpeg")
 
-    st.sidebar.image(camara,caption="", width=600)
+    st.sidebar.image(camara,caption="", width=300)
 
     activities = ["Home","Escolher Deputado","About"]
     file_csv = ['CSV/indeed_Cientista_de_dados.csv','CSV/indeed_Analista_de_dados.csv', 'CSV/indeed_Engenheiro_de_Machine_Learning.csv',
