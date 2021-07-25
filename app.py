@@ -131,7 +131,7 @@ def main():
     
        
         #col1.header("Câmara de Deputados")
-        col1.image(dados_abertos, width=700,height=500)
+        col1.image(dados_abertos, width=700)
         
    
 
