@@ -121,6 +121,13 @@ def main():
 
     df_dep = pd.DataFrame(dados, columns=colunas_dep)
     lista_dep = df_dep['nome']
+    temp = []
+    for i in lista_dep:
+         temp.append(i.upper())
+    #print(temp)
+    lista_dep = temp
+    df_dep['nome'] = lista_dep
+    
     ################################################################
     
        
