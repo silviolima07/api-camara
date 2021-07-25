@@ -92,7 +92,7 @@ def main():
 
 
     camara  = Image.open("Images/camara.jpeg")
-    aguia1  = Image.open("Images/aguia1.png")
+    
     dados_abertos  = Image.open("Images/dados_abertos.jpeg")
 
     st.sidebar.image(camara,caption="", width=300, height=500)
