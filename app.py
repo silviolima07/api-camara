@@ -104,13 +104,6 @@ def main():
 
     # Definir a data da última atualização
 
-
-    f = open("update", "r")
-    data_update = f.read()
-   
-    #if choice != 'About':
-    #    st.write('Última atualizacao: '+ data_update)
-
     ###############################################################
     # COLETAR DADOS DOS DEPUTADOS
     URL_dep = "https://dadosabertos.camara.leg.br/api/v2/deputados"
