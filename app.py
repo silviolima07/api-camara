@@ -142,7 +142,7 @@ def main():
         dep_escolhido = st.selectbox("Deputados",lista_dep)
 
         deputado = df_dep.loc[df_dep['nome'] == dep_escolhido]
-        deputado.to_csv("deputado.csv")
+        
 
         ano_escolhido = st.selectbox("Ano",anos)
         print("Ano escolhido:",ano_escolhido)
