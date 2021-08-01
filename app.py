@@ -344,7 +344,7 @@ def main():
         df_despesas = df_desp
         
         st.subheader("Gastos")
-        st.text("Coletando dado na base da Camara de deputados...")
+        st.text("Coletando dados via API na Camara de deputados...")
         bar = st.progress(0)
         
         for i in range(20):
