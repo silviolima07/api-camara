@@ -15,7 +15,7 @@ import sys
 import requests
 import pandas as pd
 
-import re
+import time
 
 
 def download_link(df, texto1, texto2):
@@ -238,7 +238,12 @@ def main():
     temp = []
     for i in lista_dep:
          temp.append(i.upper())
-    #print(temp)
+    
+    temp2 = []
+    lista2 = df_dep['nome']
+    for i in lista2:
+         temp2.append(i.upper())
+    df_dep['nome'] = temp2
     
     lista_dep = temp
     #df_dep['nome'] = lista_dep
@@ -295,6 +300,7 @@ def main():
             width=300
         )
         #st.write("dep_escolhido: "+dep_escolhido)
+        print("df_dep['nome'] :", df_dep['nome'])
         deputado = df_dep.loc[df_dep['nome'] == dep_escolhido]
         #dep = deputado.set_index('siglaPartido', inplace=True)
         st.subheader("Mandatos")
@@ -338,6 +344,14 @@ def main():
         df_despesas = df_desp
         
         st.subheader("Gastos")
+        st.text("Coletando dado na base da Camara de deputados...")
+        bar = st.progress(0)
+        
+        for i in range(20):
+            bar.progress(i * 5)
+            # wait
+            time.sleep(0.1)
+
         if (df_despesas.shape[0] > 0):
             total_declaracoes = df_despesas.shape[0]
             st.write("Total de declarações de gasto em todos mandatos: "+str(total_declaracoes))
