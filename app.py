@@ -144,9 +144,8 @@ def main():
 
     st.sidebar.image(camara,caption="", width=300)
 
-    activities = ["Home","Escolher Deputado","About"]
-    file_csv = ['CSV/indeed_Cientista_de_dados.csv','CSV/indeed_Analista_de_dados.csv', 'CSV/indeed_Engenheiro_de_Machine_Learning.csv',
-                'CSV/indeed_Engenheiro_de_Dados.csv']
+    activities = ["Home","Escolher Deputado","Legislaturas Pesquisadas","About"]
+   
     choice = st.sidebar.selectbox("Selecione uma opção",activities)
 
     # Definir a data da última atualização
@@ -177,84 +176,55 @@ def main():
     #    st.write("Sem mandato")
     ###############################################################
     # COLETAR DADOS DOS DEPUTADOS
-
-    URL_dep = "https://dadosabertos.camara.leg.br/api/v2/deputados"
-
-    colunas_dep =  ["id", "uri","nome", "siglaPartido", "uriPartido","siglaUf", "idLegislatura", "urlFoto", "email"]
-
-    #df_dep = trazer_dados_dep(URL_dep, colunas_dep)
     
-    #id_legs = [51,52, 53,54,55,56]
-    #
-    #df_dep = trazer_dados_dep(URL_dep, id_legs, colunas_dep )
-    #print("URL_dep: ", URL_dep)
-    #df_dep.rename(columns={"id": "id_dep"},inplace=True)
-    #df_dep['nome'] = str(df_dep['nome']).upper()
-
-    #print("df_dep:",df_dep.shape)
-
-
-    #print("Id_dep: ", id_dep)
-
+    df_nome = pd.read_csv("nomes.csv", encoding='iso-8859-1')
     
-    
-    PARAMS_dep = {'dataInicio':'2007-02-01', 'dataFim': '2023-01-31','ordem': 'ASC', 'ordenarPor':'nome',   'itens':9999}
+    lista_nome = df_nome['nome']
+    lista_nome_unique = list(set(lista_nome))
+    df_nome_unique = pd.DataFrame()
+    df_nome_unique['nome'] = lista_nome_unique
+    df_nome_unique.sort_values('nome', ascending=True, inplace=True)
+    #st.table(df_nome_unique['nome'])
+    lista_nome_unique = df_nome_unique['nome']
 
-    # sending get request and saving the response as response object
-    r_dep = requests.get(url = URL_dep, params = PARAMS_dep)
-    #
-    # extracting data in json format
-    data_dep = r_dep.json()
-    dados = data_dep['dados']
+    #st.write("Unique")
+    #lista_nome = df_nome_unique['nome']
+    #st.write(lista_nome)
+    #df_nome_unique.sort_values('nome', ascending=False, inplace=True)
    
-    df_dep = pd.DataFrame(dados, columns=colunas_dep)
-    df_dep2 = pd.DataFrame()
-    df_dep2[['nome','id']] = df_dep[['nome','id']]
+    
+    #st.write("Unique")
+    #st.table(df_nome_unique)
 
-    lista_nome = df_dep2['nome']
+    df_dep3 = pd.read_csv("df_dep_legs_51_56.csv", encoding='iso-8859-1')
+    df_dep3_nome_id = df_dep3[['nome','id']]
+    #lista_nome = df_nome_unique['nome']
+
     temp = []
     for i in lista_nome:
          temp.append(i.upper())
-    df_dep2['nome'] = temp
+    df_dep3['nome'] = temp
+    df_dep3_nome_id['nome'] = temp
+  
 
-    df_dep2.drop_duplicates(inplace=True)
-    df_dep2.to_csv("deputado.csv")
-
-    dict_dep = df_dep2.set_index('nome').to_dict()['id']
-
-    #st.write(dict_dep.get('ABEL MESQUITA JR.'))
+    df_dep3_nome_id.drop_duplicates(inplace=True)
     
-    print("df_dep:", df_dep.shape)
-    #st.table(df_dep['nome_id_leg'])
     
-    lista_dep = df_dep2['nome']
+
+    dict_dep = df_dep3_nome_id.set_index('nome').to_dict()['id']
+
+    df_dep_nome = pd.DataFrame()
+    df_dep_nome = df_dep3['nome']
+    
+ 
+    
+    #lista_dep = df_dep3_nome_id['nome']
+    lista_dep = lista_nome_unique
     print("Lista dep:", lista_dep)
-    #df_dep1 = df_dep[['id','nome']]
-    #lista_dep2 = set(df_dep1)
-    #df = pd.DataFrame(lista_dep2,columns=['nome', 'id'])
-    #df_dep2 = df_dep[['nome','id']]
-    #st.table(df)
-    
-    temp = []
-    for i in lista_dep:
-         temp.append(i.upper())
-    
-    temp2 = []
-    lista2 = df_dep['nome']
-    for i in lista2:
-         temp2.append(i.upper())
-    df_dep['nome'] = temp2
-    
-    lista_dep = temp
-    #df_dep['nome'] = lista_dep
-    #df_dep['nome_id_leg'] = df_dep['nome']+"---"+df_dep['id'].astype(str)
-    #df_dep['nome_leg'] = df_dep['nome']+" ---> legislatura: "+df_dep['idLegislatura'].astype(str)
-    #lista_dep = df_dep['nome_id_leg']
-    
     #
-    df_dep['id_leg'] = df_dep['idLegislatura']
-    df_dep.drop(['idLegislatura'], axis=1)
-    print("Dados deputados: ", df_dep[['nome','id','id_leg']])
+    df_dep3['id_leg'] = df_dep3['idLegislatura']
+    df_dep3.drop(['idLegislatura'], axis=1)
+    print("Dados deputados: ", df_dep3[['nome','id','id_leg']])
     
     
     ################################################################
@@ -287,10 +257,6 @@ def main():
         #nome, id_dep= dep_escolhido.split('---')
 
         #st.write("dep_escolhido: "+dep_escolhido)
-        #st.write("id dep: "+id_dep)        
-        #st.write("id_leg: "+id_leg)
-
-        #st.write(dict_dep.get('ABEL MESQUITA JR.'))
         #st.write("Id Dep Escolhido na selecao:"+ str(dict_dep.get(dep_escolhido)))
         id_dep = dict_dep.get(dep_escolhido)
         
@@ -300,12 +266,12 @@ def main():
             width=300
         )
         #st.write("dep_escolhido: "+dep_escolhido)
-        print("df_dep['nome'] :", df_dep['nome'])
-        deputado = df_dep.loc[df_dep['nome'] == dep_escolhido]
+        #st.write("df_dep3['nome']:"+df_dep3['nome'])
+        deputado = df_dep3.loc[df_dep3['nome'] == dep_escolhido]
         #dep = deputado.set_index('siglaPartido', inplace=True)
-        st.subheader("Mandatos")
+        st.subheader("Mandatos legislativos eleitos")
 
-        st.table(deputado[['siglaPartido','siglaUf', 'idLegislatura']])
+        st.table(deputado[['idLegislatura','siglaPartido','siglaUf']])
         #st.subheader("Mandatos")
         #st.write(deputado[['siglaPartido','siglaUf', 'idLegislatura']])
         #st.table(deputado[['siglaPartido','siglaUf', 'idLegislatura']])
@@ -347,17 +313,43 @@ def main():
         st.text("Coletando dados via API na Camara de deputados...")
         bar = st.progress(0)
         
-        for i in range(20):
-            bar.progress(i * 5)
+        for i in range(26):
+            bar.progress(i * 4)
             # wait
-            time.sleep(0.1)
+            time.sleep(0.4)
 
         if (df_despesas.shape[0] > 0):
             total_declaracoes = df_despesas.shape[0]
             st.write("Total de declarações de gasto em todos mandatos: "+str(total_declaracoes))
-            st.table(df_despesas[['dataDocumento',        'nomeFornecedor','tipoDespesa','valorDocumento','valorGlosa','valorLiquido']])
+            #st.table(df_despesas[['dataDocumento',        'nomeFornecedor','tipoDespesa','valorDocumento','valorGlosa','valorLiquido']])
+            st.table(df_despesas[['dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']])
+            
+            bar = st.progress(0)
+        
+            for i in range(26):
+                bar.progress(i * 4)
+                #wait
+                time.sleep(0.2)
+            
+            
+            
         else:
             st.write("Sem dados informados")
+       
+        
+
+    elif choice == activities[2]:
+
+        df_leg = pd.read_csv("df_leg_51-56.csv")
+        df_leg.set_index('id', inplace=True)
+        st.subheader("Periodos pesquisados")
+        st.table(df_leg[['dataInicio', 'dataFim']])
+        bar = st.progress(0)
+        
+        for i in range(26):
+                bar.progress(i * 4)
+                #wait
+                time.sleep(0.2)
    
     elif choice == 'About':
         #st.sidebar.image(about,caption="", width=300, height= 200)
