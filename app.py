@@ -144,12 +144,12 @@ def main():
 
     st.sidebar.image(camara,caption="", width=300)
 
-    activities = ["Home","Escolher Deputado","Legislaturas Pesquisadas","About"]
+    activities = ["Home","Escolher Deputado","Gráficos","Legislaturas Pesquisadas","About"]
    
     choice = st.sidebar.selectbox("Selecione uma opção",activities)
 
-    # Definir a data da última atualização
-
+   
+    flag = False
 
 
     ################################################################
@@ -253,92 +253,120 @@ def main():
         #st.table(pd.DataFrame(lista_nome, id_dep))
         st.subheader("Deputados")
         dep_escolhido = st.selectbox("Escolha",lista_dep)
+
+        #st.write("nome_deputado: "+nome_deputado)
+        #st.write("deputado escolhido: "+dep_escolhido)
+
+        flag = True
+
+        if st.sidebar.button('Pesquisar'):
+
+            #nome_deputado = dep_escolhido
+            #st.write("Depois de escolher - nome_deputado: "+nome_deputado)
  
-        #nome, id_dep= dep_escolhido.split('---')
+            #nome, id_dep= dep_escolhido.split('---')
 
-        #st.write("dep_escolhido: "+dep_escolhido)
-        #st.write("Id Dep Escolhido na selecao:"+ str(dict_dep.get(dep_escolhido)))
-        id_dep = dict_dep.get(dep_escolhido)
+            #st.write("dep_escolhido: "+dep_escolhido)
+            #st.write("Id Dep Escolhido na selecao:"+ str(dict_dep.get(dep_escolhido)))
+            id_dep = dict_dep.get(dep_escolhido)
         
-        #print("ID_DEP: ",id_dep)
-        st.sidebar.image(
-            "https://www.camara.leg.br/internet/deputado/bandep/"+str(id_dep).strip()+".jpg",
-            width=300
-        )
-        #st.write("dep_escolhido: "+dep_escolhido)
-        #st.write("df_dep3['nome']:"+df_dep3['nome'])
-        deputado = df_dep3.loc[df_dep3['nome'] == dep_escolhido]
-        #dep = deputado.set_index('siglaPartido', inplace=True)
-        st.subheader("Mandatos legislativos eleitos")
+            #print("ID_DEP: ",id_dep)
+            st.sidebar.image(
+                "https://www.camara.leg.br/internet/deputado/bandep/"+str(id_dep).strip()+".jpg",
+                width=300
+            )
+            #st.write("dep_escolhido: "+dep_escolhido)
+            #st.write("df_dep3['nome']:"+df_dep3['nome'])
+            deputado = df_dep3.loc[df_dep3['nome'] == dep_escolhido]
+            #dep = deputado.set_index('siglaPartido', inplace=True)
+            st.subheader("Mandatos legislativos eleitos")
 
-        st.table(deputado[['idLegislatura','siglaPartido','siglaUf']])
-        #st.subheader("Mandatos")
-        #st.write(deputado[['siglaPartido','siglaUf', 'idLegislatura']])
-        #st.table(deputado[['siglaPartido','siglaUf', 'idLegislatura']])
+            st.table(deputado[['idLegislatura','siglaPartido','siglaUf']])
+            #st.subheader("Mandatos")
+            #st.write(deputado[['siglaPartido','siglaUf', 'idLegislatura']])
+            #st.table(deputado[['siglaPartido','siglaUf', 'idLegislatura']])
 
-        #df_merged = pd.merge(df_dep,df_leg, on="id_leg")
+            #df_merged = pd.merge(df_dep,df_leg, on="id_leg")
         
 
-        #st.table(df_dep)
+            #st.table(df_dep)
 
-        #st.table(df_merged[['siglaPartido','id_leg', 'anoInicial', 'anoFinal']])     
-        #mandatos = str(deputado['idLegislatura']).split()[1]
-        #partido = str(deputado['siglaPartido']).split()[1]
-        #uf      = str(deputado['siglaUf']).split()[1]
+            #st.table(df_merged[['siglaPartido','id_leg', 'anoInicial', 'anoFinal']])     
+            #mandatos = str(deputado['idLegislatura']).split()[1]
+            #partido = str(deputado['siglaPartido']).split()[1]
+            #uf      = str(deputado['siglaUf']).split()[1]
 
-        #st.sidebar.write("Legislatura: "+ mandatos,"Partido: "+ partido, "UF: "+uf)
+            #st.sidebar.write("Legislatura: "+ mandatos,"Partido: "+ partido, "UF: "+uf)
         
-        #lista_id_leg = [int(id_leg)]
+            #lista_id_leg = [int(id_leg)]
         
-        #df_despesas = coletar_despesas(id_dep, id_leg)
-        anos = ['2007','2008','2009','2010', '2011', '2012','2013', '2014', '2015','2016', '2017', '2018', '2019', '2020','2021']
-        id_legs = [51,52, 53,54,55,56]
-        URL_desp = "https://dadosabertos.camara.leg.br/api/v2/deputados/"+str(id_dep)+"/despesas"
-        coluna_desp = ['ano','cnpjCpfFornecedor','codDocumento','codLote','codTipoDocumento','dataDocumento','mes',
+            #df_despesas = coletar_despesas(id_dep, id_leg)
+            anos = ['2007','2008','2009','2010', '2011', '2012','2013', '2014', '2015','2016', '2017', '2018', '2019', '2020','2021']
+            id_legs = [51,52, 53,54,55,56]
+            URL_desp = "https://dadosabertos.camara.leg.br/api/v2/deputados/"+str(id_dep)+"/despesas"
+            coluna_desp = ['ano','cnpjCpfFornecedor','codDocumento','codLote','codTipoDocumento','dataDocumento','mes',
            'nomeFornecedor','numDocumento','numRessarcimento','parcela','tipoDespesa','tipoDocumento',
            'urlDocumento','valorDocumento','valorGlosa','valorLiquido'] 
 
-        #dfs = []
-        #for ano in (anos):
-        #    print("ANO:",ano)
-        df_desp = trazer_dados_desp(URL_desp,id_dep, coluna_desp)
+            #dfs = []
+            #for ano in (anos):
+            #    print("ANO:",ano)
+            df_desp = trazer_dados_desp(URL_desp,id_dep, coluna_desp)
 
-        #df_desp = pd.concat(dfs)
-
-        #df_desp['id_dep'] = id_dep
-        print("df_desp:", df_desp.shape)
-        df_despesas = df_desp
-        
-        st.subheader("Gastos")
-        st.text("Coletando dados via API na Camara de deputados...")
-        bar = st.progress(0)
-        
-        for i in range(26):
-            bar.progress(i * 4)
-            # wait
-            time.sleep(0.4)
-
-        if (df_despesas.shape[0] > 0):
-            total_declaracoes = df_despesas.shape[0]
-            st.write("Total de declarações de gasto em todos mandatos: "+str(total_declaracoes))
-            #st.table(df_despesas[['dataDocumento',        'nomeFornecedor','tipoDespesa','valorDocumento','valorGlosa','valorLiquido']])
-            st.table(df_despesas[['dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']])
+            df_desp.to_csv("df_despesas.csv")
+            df_desp = pd.read_csv("df_despesas.csv", decimal=",", thousands = '.')
             
+
+            #df_desp = pd.concat(dfs)
+
+            #df_desp['id_dep'] = id_dep
+            print("df_desp:", df_desp.shape)
+            df_despesas = df_desp
+
+            temp = df_despesas
+            temp['nome'] = dep_escolhido
+            temp['id_dep'] = dict_dep.get(dep_escolhido)
+               
+                
+            temp[['id_dep','nome','dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']].to_csv("gastos.csv")
+        
+            st.subheader("Gastos")
+            st.text("Coletando dados via API na Camara de deputados...")
             bar = st.progress(0)
         
             for i in range(26):
                 bar.progress(i * 4)
-                #wait
-                time.sleep(0.2)
+                # wait
+                time.sleep(0.4)
+
+            if (df_despesas.shape[0] > 0):
+                
+                #temp = df_despesas
+                #temp['nome'] = dep_escolhido
+                #temp['id_dep'] = dict_dep.get(dep_escolhido)
+               
+                
+                #temp[['id_dep','nome','dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']].to_csv("gastos.csv")
+                total_declaracoes = df_despesas.shape[0]
+                st.write("Total de declarações de gasto em todos mandatos: "+str(total_declaracoes))
+                #st.table(df_despesas[['dataDocumento',        'nomeFornecedor','tipoDespesa','valorDocumento','valorGlosa','valorLiquido']])
+                st.table(df_despesas[['dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']])
             
+                bar = st.progress(0)
+        
+                for i in range(26):
+                    bar.progress(i * 4)
+                    #wait
+                    time.sleep(0.2)
             
+              
             
-        else:
-            st.write("Sem dados informados")
+            else:
+                st.write("Sem dados informados")
        
         
 
-    elif choice == activities[2]:
+    elif choice == "Legislaturas Pesquisadas":
 
         df_leg = pd.read_csv("df_leg_51-56.csv")
         df_leg.set_index('id', inplace=True)
@@ -350,7 +378,76 @@ def main():
                 bar.progress(i * 4)
                 #wait
                 time.sleep(0.2)
+
+    elif choice == "Gráficos":
    
+        
+        df_gastos = pd.read_csv("gastos.csv", decimal=".")
+        nome = list(set(df_gastos['nome']))
+        nome = str(nome).replace("['",'')
+        nome = str(nome).replace("']",'')
+        
+        id_dep = list(set(df_gastos['id_dep']))
+        id_dep = str(id_dep).split(':')
+        
+        id_dep = str(id_dep).replace("['",'')
+        id_dep = str(id_dep).replace("']",'')
+        id_dep = str(id_dep).replace("[",'')
+        id_dep = str(id_dep).replace("]",'')
+        #st.write(id_dep)
+        
+        st.subheader(nome)
+        #st.subheader(id_dep)
+
+        #import matplotlib.pyplot as plt
+        #from bokeh.plotting import figure
+        #import numpy as np
+
+        #import locale
+        #locale.setlocale(locale.LC_ALL,'')
+
+
+        #tipoDespesa = df_gastos.groupby('tipoDespesa')
+    
+        #value_count = df_gastos['tipoDespesa'].value_counts()
+        
+        #st.table(value_count)
+
+        x = st.sidebar.slider('Top-N Gastos', min_value = 3, max_value=10, value = 5 )
+
+        st.subheader("Top "+str(x)+" maiores tipos de despesas")  
+        
+        df_serie = df_gastos.groupby(['tipoDespesa'])['valorLiquido'].sum().nlargest(x)
+        df = df_serie.to_frame().sort_values(by='valorLiquido', ascending=False)
+        st.table(df.style.format('{:.2f}'))
+        
+        st.subheader("Top "+str(x)+" maiores despesas com fornecedores")
+        df_serie = df_gastos.groupby(['nomeFornecedor'])['valorLiquido'].sum().nlargest(x)
+        df = df_serie.to_frame().sort_values(by='valorLiquido', ascending=False)
+        st.table(df.style.format('{:.2f}'))
+       
+        #print(pd.DataFrame([df_serie]))
+
+        #import locale
+        #locale.setlocale(locale.LC_ALL,'')
+        #st.write(locale.currency(2500))
+   
+        st.sidebar.image(
+                "https://www.camara.leg.br/internet/deputado/bandep/"+str(id_dep).strip()+".jpg",
+                width=300
+            )
+        
+        
+        #st.table(df_gastos[['dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']])
+
+        bar = st.progress(0)
+        
+        for i in range(26):
+                bar.progress(i * 4)
+                #wait
+                time.sleep(0.2)
+
+
     elif choice == 'About':
         #st.sidebar.image(about,caption="", width=300, height= 200)
         st.subheader("Built with Streamlit")
@@ -373,8 +470,18 @@ def main():
             div = Div(text=html)
             st.bokeh_chart(div)
    
+    #if choice == "Escolher Deputado" and choice2 == "Gráficos":
+    #    st.subheader("Gastos de:"+ dep_escolhido)
+    #    #st.table(df_despesas)
+        
+    #    bar = st.progress(0)
+        
+    #    for i in range(26):
+    #            bar.progress(i * 4)
+    #            #wait
+    #            time.sleep(0.2)
 
-   
+     
     
     
 if __name__ == '__main__':
