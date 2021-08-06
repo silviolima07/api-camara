@@ -18,6 +18,7 @@ import pandas as pd
 import time
 
 
+
 def download_link(df, texto1, texto2):
     if isinstance(df,pd.DataFrame):
         object_to_download = df.to_csv(index=False)
