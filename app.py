@@ -315,7 +315,7 @@ def main():
             df_desp = trazer_dados_desp(URL_desp,id_dep, coluna_desp)
 
             df_desp.to_csv("df_despesas.csv")
-            df_desp = pd.read_csv("df_despesas.csv", decimal=",", thousands = '.')
+            df_desp = pd.read_csv("df_despesas.csv", decimal=",")
             
 
             #df_desp = pd.concat(dfs)
