@@ -23,6 +23,20 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 @st.cache(suppress_st_warning=False) 
 
 
+
+
+def get_table_download_link(df):
+    """Generates a link allowing the data in a given panda dataframe to be downloaded
+    in:  dataframe
+    out: href string
+    """
+    csv = df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
+    href = f'<a href="data:file/csv;base64,{b64}">Download csv file</a>'
+    return href
+
+
+
 def download_link(df, texto1, texto2):
     if isinstance(df,pd.DataFrame):
         object_to_download = df.to_csv(index=False)
@@ -139,6 +153,7 @@ def main():
     </div>
               """
     st.markdown(html_page, unsafe_allow_html=True)
+
 
     anos = ['2007','2008','2009','2010', '2011', '2012','2013', '2014', '2015', 
           '2016', '2017', '2018', '2019', '2020','2021']   
@@ -257,9 +272,9 @@ def main():
             deputado['Uf'] = deputado['siglaUf']
             deputado.set_index('Legislatura', inplace=True)
             
-            st.subheader("Mandatos legislativos eleitos")
+            st.sidebar.write("Mandatos legislativos eleitos")
 
-            st.table(deputado[['Partido','Uf']])
+            st.sidebar.table(deputado[['Partido','Uf']])
 
             anos = ['2007','2008','2009','2010', '2011', '2012','2013', '2014', '2015','2016', '2017', '2018', '2019', '2020','2021']
             id_legs = [51,52, 53,54,55,56]
@@ -296,13 +311,26 @@ def main():
                 temp = df_despesas
                 temp['nome'] = dep_escolhido
                 temp['id_dep'] = dict_dep.get(dep_escolhido)
-               
+                df_despesas['DateTime'] = pd.to_datetime(df_despesas['dataDocumento'])
+                df_despesas['Dia'] = df_despesas['DateTime'].dt.day
+                df_despesas['Mes'] = df_despesas['DateTime'].dt.month
+                df_despesas['Ano'] = df_despesas['DateTime'].dt.year
                 
-                temp[['id_dep','nome','dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']].to_csv("gastos.csv")
+                df_despesas['Ano-Mes'] = df_despesas['DateTime'].dt.strftime('%Y-%m')
+                
+                temp[['id_dep','nome','Ano-Mes','dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']].to_csv("gastos.csv")
                 total_declaracoes = df_despesas.shape[0]
                 df_despesas['Reais'] = df_despesas['valorLiquido']
+
+                           
+                #df_despesas['dataDocumento']= pd.to_datetime(df_despesas['dataDocumento'],format='%Y-%m-%d')
+                
+
+                #st.table(df_despesas['Ano-Mes'])
+                #print("Ano:", str(df_despesas['Ano']).split('.')[0])
+               
+                
                 st.write("Total de declarações de gasto em todos mandatos: "+str(total_declaracoes))
-                #st.table(df_despesas[['dataDocumento',        'nomeFornecedor','tipoDespesa','valorDocumento','valorGlosa','valorLiquido']])
                 st.table(df_despesas[['dataDocumento',        'nomeFornecedor','tipoDespesa','Reais']])
             
                 bar = st.progress(0)
@@ -312,8 +340,11 @@ def main():
                     #wait
                     time.sleep(0.2)
             
-              
-            
+                #st.markdown(get_table_download_link(df_despesas), unsafe_allow_html=True)
+                #download_link(df, texto1, texto2)
+                nome = dep_escolhido.replace(' ','-')+".csv"
+                st.markdown(download_link(df_despesas[['dataDocumento',        'nomeFornecedor','tipoDespesa','Reais']], nome, nome), unsafe_allow_html=True)
+        
             else:
                 st.write("Sem dados informados")
        
@@ -354,18 +385,31 @@ def main():
 
         x = st.sidebar.slider('Top-N Gastos', min_value = 3, max_value=10, value = 5 )
 
-        st.subheader("Top "+str(x)+" maiores tipos de despesas")  
+        st.subheader("Top "+str(x)+"--> Maiores despesas por tipo")  
         
-        df_serie = df_gastos.groupby(['tipoDespesa'])['Reais'].sum().nlargest(x)
-        df = df_serie.to_frame().sort_values(by='Reais', ascending=False)
+        df_gastos['Tipo Despesa    /    Reais'] = df_gastos['Reais']
+        df_serie = df_gastos.groupby(['tipoDespesa'])['Tipo Despesa    /    Reais'].sum().nlargest(x)
+        df = df_serie.to_frame().sort_values(by='Tipo Despesa    /    Reais', ascending=False)
         st.table(df.style.format('{:.2f}'))
         
-        st.subheader("Top "+str(x)+" maiores despesas com fornecedores")
+        st.subheader("Top "+str(x)+"--> Maiores despesas por fornecedores")
         
-        df_serie = df_gastos.groupby(['nomeFornecedor'])['Reais'].sum().nlargest(x)
-        df = df_serie.to_frame().sort_values(by='Reais', ascending=False)
+        df_gastos['Fornecedor    /    Reais'] = df_gastos['Reais']
+        df_serie = df_gastos.groupby(['nomeFornecedor'])['Fornecedor    /    Reais'].sum().nlargest(x)
+        df = df_serie.to_frame().sort_values(by='Fornecedor    /    Reais', ascending=False)
         st.table(df.style.format('{:.2f}'))
        
+        st.subheader("Top "+str(x)+"--> Maiores qtdes de serviços prestados por fornecedor")
+        df_gastos['Fornecedor    /    Quantidade'] = df_gastos['nomeFornecedor']
+        
+        st.table(df_gastos['Fornecedor    /    Quantidade'].value_counts().head(x))
+
+        st.subheader("Top "+str(x)+"--> Maiores qtdes de serviços prestados por tipo de despesa")
+        df_gastos['Tipo Despesa    /    Quantidade'] = df_gastos['tipoDespesa']
+
+        st.table(df_gastos['Tipo Despesa    /    Quantidade'].value_counts().head(x))
+        
+        
    
         st.sidebar.image(
                 "https://www.camara.leg.br/internet/deputado/bandep/"+str(id_dep).strip()+".jpg",
