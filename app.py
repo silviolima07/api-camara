@@ -287,7 +287,7 @@ def main():
 
             #print("df_desp:", df_desp.shape)
             #df_despesas = df_desp
-            df_desp.to_csv("despesas.csv")
+            df_desp.to_csv("/tmp/despesas.csv")
             df_despesas = pd.read_csv("despesas.csv", decimal=",")
 
             temp = df_despesas
