@@ -17,6 +17,10 @@ import pandas as pd
 
 import time
 
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+
+@st.cache(suppress_st_warning=False) 
 
 
 def download_link(df, texto1, texto2):
@@ -51,7 +55,7 @@ def trazer_dados_dep(url_dep,coluna_dep):
       #
       
       data_dep = r_dep.json()
-      print("data_dep:", data_dep)
+      #print("data_dep:", data_dep)
       """
       dados_dep = data_dep['dados']
       dfs_dep.append(pd.DataFrame(dados_dep, columns=coluna))
@@ -70,10 +74,10 @@ def trazer_dados_desp(url_desp,id_dep, coluna_desp):
   URL_desp = url_desp
   coluna = coluna_desp
   dfs_desp=[]
-  print("Id_dep:", id_dep)
+  #print("Id_dep:", id_dep)
   
   for i in (anos):
-      print("Ano: ", i)
+      #print("Ano: ", i)
   
       PARAMS_desp = {'ano':i,'itens':9999}
       # sending get request and saving the response as response object
@@ -81,7 +85,7 @@ def trazer_dados_desp(url_desp,id_dep, coluna_desp):
       # extracting data in json forma
       data_desp = r_desp.json()
       dados_desp = data_desp['dados']
-      print("Shape:",pd.DataFrame(dados_desp, columns=coluna).shape)
+      #print("Shape:",pd.DataFrame(dados_desp, columns=coluna).shape)
       dfs_desp.append(pd.DataFrame(dados_desp, columns=coluna))
 
   df_desp = pd.concat(dfs_desp)
@@ -119,6 +123,8 @@ def main():
 
     """Indeed App """
 
+    
+
     # Titulo do web app
     html_page = """
     <div style="background-color:blue;padding=30px">
@@ -145,7 +151,7 @@ def main():
 
     st.sidebar.image(camara,caption="", width=300)
 
-    activities = ["Home","Escolher Deputado","Gráficos","Legislaturas Pesquisadas","About"]
+    activities = ["Home","Escolher Deputado","Top N Gastos","Legislaturas Pesquisadas","About"]
    
     choice = st.sidebar.selectbox("Selecione uma opção",activities)
 
@@ -162,19 +168,10 @@ def main():
     df_leg[['anoInicial', 'mes']] = df_leg['dataInicio'].str.split('-', 1, expand=True)
     df_leg[['anoFinal','mes']] = df_leg['dataFim'].str.split('-', 1, expand=True)
    
-    #st.table(df_leg[['id','anoInicial','anoFinal']])
 
-    #df_leg['anoInicial'] = str(df_leg['dataInicio']).split('-')[0]
-    #df_leg['anoFinal'] = str(df_leg['dataFim']).split('-')[0]
-    #print("Tabela Legislaturas: ",df_leg)
-    #st.sidebar.write("Legislaturas validas")
     df_leg['id_leg'] = df_leg['id']
     df_leg.drop(['id'], axis=1)
-    #st.sidebar.table(df_leg[['id_leg', 'dataInicio', 'dataFim']])
-    #if (df_leg.shape[0] > 0):
-    #    st.table(df_leg)
-    #else:
-    #    st.write("Sem mandato")
+  
     ###############################################################
     # COLETAR DADOS DOS DEPUTADOS
     
@@ -185,21 +182,12 @@ def main():
     df_nome_unique = pd.DataFrame()
     df_nome_unique['nome'] = lista_nome_unique
     df_nome_unique.sort_values('nome', ascending=True, inplace=True)
-    #st.table(df_nome_unique['nome'])
-    lista_nome_unique = df_nome_unique['nome']
-
-    #st.write("Unique")
-    #lista_nome = df_nome_unique['nome']
-    #st.write(lista_nome)
-    #df_nome_unique.sort_values('nome', ascending=False, inplace=True)
-   
     
-    #st.write("Unique")
-    #st.table(df_nome_unique)
+    lista_nome_unique = df_nome_unique['nome']
 
     df_dep3 = pd.read_csv("df_dep_legs_51_56.csv", encoding='iso-8859-1')
     df_dep3_nome_id = df_dep3[['nome','id']]
-    #lista_nome = df_nome_unique['nome']
+   
 
     temp = []
     for i in lista_nome:
@@ -221,11 +209,11 @@ def main():
     
     #lista_dep = df_dep3_nome_id['nome']
     lista_dep = lista_nome_unique
-    print("Lista dep:", lista_dep)
+    #print("Lista dep:", lista_dep)
     #
     df_dep3['id_leg'] = df_dep3['idLegislatura']
     df_dep3.drop(['idLegislatura'], axis=1)
-    print("Dados deputados: ", df_dep3[['nome','id','id_leg']])
+    #print("Dados deputados: ", df_dep3[['nome','id','id_leg']])
     
     
     ################################################################
@@ -249,59 +237,30 @@ def main():
         df_dep_unique['nome_dep'] = df_dep_unique['nome']
         df_dep_unique.set_index('nome', inplace=True)
         lista_dep = df_dep_unique['nome_dep']
-        #st.table(df_dep_unique)
-        #st.write(lista_nome)
-        #st.table(pd.DataFrame(lista_nome, id_dep))
+       
         st.subheader("Deputados")
         dep_escolhido = st.selectbox("Escolha",lista_dep)
-
-        #st.write("nome_deputado: "+nome_deputado)
-        #st.write("deputado escolhido: "+dep_escolhido)
 
         flag = True
 
         if st.sidebar.button('Pesquisar'):
 
-            #nome_deputado = dep_escolhido
-            #st.write("Depois de escolher - nome_deputado: "+nome_deputado)
- 
-            #nome, id_dep= dep_escolhido.split('---')
-
-            #st.write("dep_escolhido: "+dep_escolhido)
-            #st.write("Id Dep Escolhido na selecao:"+ str(dict_dep.get(dep_escolhido)))
             id_dep = dict_dep.get(dep_escolhido)
         
-            #print("ID_DEP: ",id_dep)
             st.sidebar.image(
                 "https://www.camara.leg.br/internet/deputado/bandep/"+str(id_dep).strip()+".jpg",
                 width=300
             )
-            #st.write("dep_escolhido: "+dep_escolhido)
-            #st.write("df_dep3['nome']:"+df_dep3['nome'])
             deputado = df_dep3.loc[df_dep3['nome'] == dep_escolhido]
-            #dep = deputado.set_index('siglaPartido', inplace=True)
+            deputado['Legislatura'] = deputado['idLegislatura']
+            deputado['Partido'] = deputado['siglaPartido']
+            deputado['Uf'] = deputado['siglaUf']
+            deputado.set_index('Legislatura', inplace=True)
+            
             st.subheader("Mandatos legislativos eleitos")
 
-            st.table(deputado[['idLegislatura','siglaPartido','siglaUf']])
-            #st.subheader("Mandatos")
-            #st.write(deputado[['siglaPartido','siglaUf', 'idLegislatura']])
-            #st.table(deputado[['siglaPartido','siglaUf', 'idLegislatura']])
+            st.table(deputado[['Partido','Uf']])
 
-            #df_merged = pd.merge(df_dep,df_leg, on="id_leg")
-        
-
-            #st.table(df_dep)
-
-            #st.table(df_merged[['siglaPartido','id_leg', 'anoInicial', 'anoFinal']])     
-            #mandatos = str(deputado['idLegislatura']).split()[1]
-            #partido = str(deputado['siglaPartido']).split()[1]
-            #uf      = str(deputado['siglaUf']).split()[1]
-
-            #st.sidebar.write("Legislatura: "+ mandatos,"Partido: "+ partido, "UF: "+uf)
-        
-            #lista_id_leg = [int(id_leg)]
-        
-            #df_despesas = coletar_despesas(id_dep, id_leg)
             anos = ['2007','2008','2009','2010', '2011', '2012','2013', '2014', '2015','2016', '2017', '2018', '2019', '2020','2021']
             id_legs = [51,52, 53,54,55,56]
             URL_desp = "https://dadosabertos.camara.leg.br/api/v2/deputados/"+str(id_dep)+"/despesas"
@@ -309,30 +268,22 @@ def main():
            'nomeFornecedor','numDocumento','numRessarcimento','parcela','tipoDespesa','tipoDocumento',
            'urlDocumento','valorDocumento','valorGlosa','valorLiquido'] 
 
-            #dfs = []
-            #for ano in (anos):
-            #    print("ANO:",ano)
             df_desp = trazer_dados_desp(URL_desp,id_dep, coluna_desp)
 
-            #df_desp.to_csv("df_despesas.csv")
-            #df_desp = pd.read_csv("df_despesas.csv", decimal=",")
-            
-
-            #df_desp = pd.concat(dfs)
-
-            #df_desp['id_dep'] = id_dep
-            print("df_desp:", df_desp.shape)
-            df_despesas = df_desp
+            #print("df_desp:", df_desp.shape)
+            #df_despesas = df_desp
+            df_desp.to_csv("despesas.csv")
+            df_despesas = pd.read_csv("despesas.csv", decimal=",")
 
             temp = df_despesas
             temp['nome'] = dep_escolhido
             temp['id_dep'] = dict_dep.get(dep_escolhido)
                
                 
-            temp[['id_dep','nome','dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']].to_csv("gastos.csv")
+            #temp[['id_dep','nome','dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']].to_csv("gastos.csv")
         
             st.subheader("Gastos")
-            st.text("Coletando dados via API na Camara de deputados...")
+            st.text("Coletando dados via API na Camara de deputados, aguarde terminar...")
             bar = st.progress(0)
         
             for i in range(26):
@@ -342,16 +293,17 @@ def main():
 
             if (df_despesas.shape[0] > 0):
                 
-                #temp = df_despesas
-                #temp['nome'] = dep_escolhido
-                #temp['id_dep'] = dict_dep.get(dep_escolhido)
+                temp = df_despesas
+                temp['nome'] = dep_escolhido
+                temp['id_dep'] = dict_dep.get(dep_escolhido)
                
                 
-                #temp[['id_dep','nome','dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']].to_csv("gastos.csv")
+                temp[['id_dep','nome','dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']].to_csv("gastos.csv")
                 total_declaracoes = df_despesas.shape[0]
+                df_despesas['Reais'] = df_despesas['valorLiquido']
                 st.write("Total de declarações de gasto em todos mandatos: "+str(total_declaracoes))
                 #st.table(df_despesas[['dataDocumento',        'nomeFornecedor','tipoDespesa','valorDocumento','valorGlosa','valorLiquido']])
-                st.table(df_despesas[['dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']])
+                st.table(df_despesas[['dataDocumento',        'nomeFornecedor','tipoDespesa','Reais']])
             
                 bar = st.progress(0)
         
@@ -380,10 +332,11 @@ def main():
                 #wait
                 time.sleep(0.2)
 
-    elif choice == "Gráficos":
+    elif choice == "Top N Gastos":
    
         
         df_gastos = pd.read_csv("gastos.csv", decimal=".")
+        df_gastos['Reais'] = df_gastos["valorLiquido"]
         nome = list(set(df_gastos['nome']))
         nome = str(nome).replace("['",'')
         nome = str(nome).replace("']",'')
@@ -398,40 +351,21 @@ def main():
         #st.write(id_dep)
         
         st.subheader(nome)
-        #st.subheader(id_dep)
-
-        #import matplotlib.pyplot as plt
-        #from bokeh.plotting import figure
-        #import numpy as np
-
-        #import locale
-        #locale.setlocale(locale.LC_ALL,'')
-
-
-        #tipoDespesa = df_gastos.groupby('tipoDespesa')
-    
-        #value_count = df_gastos['tipoDespesa'].value_counts()
-        
-        #st.table(value_count)
 
         x = st.sidebar.slider('Top-N Gastos', min_value = 3, max_value=10, value = 5 )
 
         st.subheader("Top "+str(x)+" maiores tipos de despesas")  
         
-        df_serie = df_gastos.groupby(['tipoDespesa'])['valorLiquido'].sum().nlargest(x)
-        df = df_serie.to_frame().sort_values(by='valorLiquido', ascending=False)
+        df_serie = df_gastos.groupby(['tipoDespesa'])['Reais'].sum().nlargest(x)
+        df = df_serie.to_frame().sort_values(by='Reais', ascending=False)
         st.table(df.style.format('{:.2f}'))
         
         st.subheader("Top "+str(x)+" maiores despesas com fornecedores")
-        df_serie = df_gastos.groupby(['nomeFornecedor'])['valorLiquido'].sum().nlargest(x)
-        df = df_serie.to_frame().sort_values(by='valorLiquido', ascending=False)
+        
+        df_serie = df_gastos.groupby(['nomeFornecedor'])['Reais'].sum().nlargest(x)
+        df = df_serie.to_frame().sort_values(by='Reais', ascending=False)
         st.table(df.style.format('{:.2f}'))
        
-        #print(pd.DataFrame([df_serie]))
-
-        #import locale
-        #locale.setlocale(locale.LC_ALL,'')
-        #st.write(locale.currency(2500))
    
         st.sidebar.image(
                 "https://www.camara.leg.br/internet/deputado/bandep/"+str(id_dep).strip()+".jpg",
@@ -471,16 +405,7 @@ def main():
             div = Div(text=html)
             st.bokeh_chart(div)
    
-    #if choice == "Escolher Deputado" and choice2 == "Gráficos":
-    #    st.subheader("Gastos de:"+ dep_escolhido)
-    #    #st.table(df_despesas)
-        
-    #    bar = st.progress(0)
-        
-    #    for i in range(26):
-    #            bar.progress(i * 4)
-    #            #wait
-    #            time.sleep(0.2)
+    
 
      
     
