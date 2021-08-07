@@ -283,6 +283,9 @@ def main():
            'nomeFornecedor','numDocumento','numRessarcimento','parcela','tipoDespesa','tipoDocumento',
            'urlDocumento','valorDocumento','valorGlosa','valorLiquido'] 
 
+            st.subheader("Gastos")
+            st.text("Coletando dados via API na Camara de deputados, aguarde terminar...")
+
             df_desp = trazer_dados_desp(URL_desp,id_dep, coluna_desp)
 
             #print("df_desp:", df_desp.shape)
@@ -297,8 +300,7 @@ def main():
                 
             #temp[['id_dep','nome','dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']].to_csv("gastos.csv")
         
-            st.subheader("Gastos")
-            st.text("Coletando dados via API na Camara de deputados, aguarde terminar...")
+            
             bar = st.progress(0)
         
             for i in range(26):
