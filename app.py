@@ -406,7 +406,11 @@ def main():
         df_gastos['Fornecedor    /    Quantidade'] = df_gastos['nomeFornecedor']
         
         st.table(df_gastos['Fornecedor    /    Quantidade'].value_counts().head(x))
-
+ 
+        if x > 9:
+            x = 9
+        else:
+            x = x
         st.subheader("Top "+str(x)+"--> Maiores qtdes de serviços prestados por tipo de despesa")
         df_gastos['Tipo Despesa    /    Quantidade'] = df_gastos['tipoDespesa']
 
