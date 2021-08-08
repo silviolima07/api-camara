@@ -285,6 +285,7 @@ def main():
 
             st.subheader("Gastos")
             st.text("Coletando dados via API na Camara de deputados, aguarde terminar...")
+            st.text("-> https://dadosabertos.camara.leg.br/api/v2/deputados/idDep/despesas?idLegislatura")
 
             df_desp = trazer_dados_desp(URL_desp,id_dep, coluna_desp)
 
@@ -434,14 +435,18 @@ def main():
         st.subheader("Built with Streamlit")
         
         st.write("Dados coletados via API da Camara de Deputados do Brasil.")
+        st.write("https://dadosabertos.camara.leg.br/swagger/api.html")
         
-        #st.write("Executados via crontab scripts realizam o scrap e atualização do app.")
-        #st.write("Foram definidos 4 cargos apenas para validar o processo.")
-        #st.write("O scrap para o cargo de Engenheiro de Machine Learning trouxe poucas linhas.")
-        #st.write("Para os demais cargos, foram encontradas mais de 100 vagas, distribuídas em diversas páginas.")
-        #st.write("Esse app traz as 10 primeiras páginas apenas.")
-        ##st.subheader("Versão 02")
-        ##st.write(" - incluído o link encurtado da vaga")
+        st.subheader("9 Tipos de Despesas:")
+        st.write("-> MANUTENÇÃO DE ESCRITÓRIO DE APOIO À ATIVIDADE PARLAMENTAR")
+        st.write("-> AQUISIÇÃO OU LOC. DE SOFTWARE; SERV. POSTAIS; ASS.")
+        st.write("-> DIVULGAÇÃO DA ATIVIDADE PARLAMENTAR")
+        st.write("-> AQUISIÇÃO DE MATERIAL DE ESCRITÓRIO")
+        st.write("-> COMBUSTÍVEIS E LUBRIFICANTES")
+        st.write("-> PASSAGEM AÉREA - REEMBOLSO")
+        st.write("-> PASSAGEM AÉREA - RPA")
+        st.write("-> SERVIÇOS POSTAIS")
+        st.write("-> TELEFONIA")
         
         st.subheader("by Silvio Lima")
         
