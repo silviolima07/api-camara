@@ -292,7 +292,7 @@ def main():
             #print("df_desp:", df_desp.shape)
             #df_despesas = df_desp
             df_desp.to_csv("/tmp/despesas.csv")
-            df_despesas = pd.read_csv("despesas.csv", decimal=",")
+            df_despesas = pd.read_csv("/tmp/despesas.csv", decimal=",")
 
             temp = df_despesas
             temp['nome'] = dep_escolhido
@@ -321,7 +321,7 @@ def main():
                 
                 df_despesas['Ano-Mes'] = df_despesas['DateTime'].dt.strftime('%Y-%m')
                 
-                temp[['id_dep','nome','Ano-Mes','dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']].to_csv("gastos.csv")
+                temp[['id_dep','nome','Ano-Mes','dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']].to_csv("/tmp/gastos.csv")
                 total_declaracoes = df_despesas.shape[0]
                 df_despesas['Reais'] = df_despesas['valorLiquido']
 
@@ -369,7 +369,7 @@ def main():
     elif choice == "Top N Gastos":
    
         
-        df_gastos = pd.read_csv("gastos.csv", decimal=".")
+        df_gastos = pd.read_csv("/tmp/gastos.csv", decimal=".")
         df_gastos['Reais'] = df_gastos["valorLiquido"]
         nome = list(set(df_gastos['nome']))
         nome = str(nome).replace("['",'')
