@@ -321,7 +321,8 @@ def main():
                 
                 df_despesas['Ano-Mes'] = df_despesas['DateTime'].dt.strftime('%Y-%m')
                 
-                temp[['id_dep','nome','Ano-Mes','dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']].to_csv("/tmp/gastos.csv")
+                temp[['id_dep','nome','Ano-Mes','dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']].to_csv("/tmp/gastos.csv") 
+
                 total_declaracoes = df_despesas.shape[0]
                 df_despesas['Reais'] = df_despesas['valorLiquido']
 
@@ -354,85 +355,94 @@ def main():
         
 
     elif choice == "Legislaturas Pesquisadas":
-
+        st.subheader("Periodos pesquisados")
+       
+        bar = st.progress(0)
+        
+        for i in range(26):
+                bar.progress(i * 4)
+                #wait
+                time.sleep(0.2)
         df_leg = pd.read_csv("df_leg_51-56.csv")
         df_leg.set_index('id', inplace=True)
-        st.subheader("Periodos pesquisados")
+        
         st.table(df_leg[['dataInicio', 'dataFim']])
         bar = st.progress(0)
         
         for i in range(26):
                 bar.progress(i * 4)
                 #wait
-                time.sleep(0.2)
+                time.sleep(0.01)
 
     elif choice == "Top N Gastos":
+        
    
+        try:
+            df_gastos = pd.read_csv("/tmp/gastos.csv", decimal=".")
+            df_gastos['Reais'] = df_gastos["valorLiquido"]
+            nome = list(set(df_gastos['nome']))
+            nome = str(nome).replace("['",'')
+            nome = str(nome).replace("']",'')
         
-        df_gastos = pd.read_csv("/tmp/gastos.csv", decimal=".")
-        df_gastos['Reais'] = df_gastos["valorLiquido"]
-        nome = list(set(df_gastos['nome']))
-        nome = str(nome).replace("['",'')
-        nome = str(nome).replace("']",'')
+            id_dep = list(set(df_gastos['id_dep']))
+            id_dep = str(id_dep).split(':')
         
-        id_dep = list(set(df_gastos['id_dep']))
-        id_dep = str(id_dep).split(':')
+            id_dep = str(id_dep).replace("['",'')
+            id_dep = str(id_dep).replace("']",'')
+            id_dep = str(id_dep).replace("[",'')
+            id_dep = str(id_dep).replace("]",'')
+            #st.write(id_dep)
         
-        id_dep = str(id_dep).replace("['",'')
-        id_dep = str(id_dep).replace("']",'')
-        id_dep = str(id_dep).replace("[",'')
-        id_dep = str(id_dep).replace("]",'')
-        #st.write(id_dep)
+            st.subheader(nome)
+            x = st.sidebar.slider('Top-N Gastos', min_value = 1, max_value=7, value = 3 )
+            st.markdown("# Top "+str(x))
+            
+            st.subheader("Maiores despesas por tipo")  
         
-        st.subheader(nome)
-
-        x = st.sidebar.slider('Top-N Gastos', min_value = 3, max_value=10, value = 5 )
-
-        st.subheader("Top "+str(x)+"--> Maiores despesas por tipo")  
+            df_gastos['Tipo Despesa    /    Reais'] = df_gastos['Reais']
+            df_serie = df_gastos.groupby(['tipoDespesa'])['Tipo Despesa    /    Reais'].sum().nlargest(x)
+            df = df_serie.to_frame().sort_values(by='Tipo Despesa    /    Reais', ascending=False)
+            st.table(df.style.format('{:.2f}'))
         
-        df_gastos['Tipo Despesa    /    Reais'] = df_gastos['Reais']
-        df_serie = df_gastos.groupby(['tipoDespesa'])['Tipo Despesa    /    Reais'].sum().nlargest(x)
-        df = df_serie.to_frame().sort_values(by='Tipo Despesa    /    Reais', ascending=False)
-        st.table(df.style.format('{:.2f}'))
+            st.subheader("Maiores despesas por fornecedores")
         
-        st.subheader("Top "+str(x)+"--> Maiores despesas por fornecedores")
-        
-        df_gastos['Fornecedor    /    Reais'] = df_gastos['Reais']
-        df_serie = df_gastos.groupby(['nomeFornecedor'])['Fornecedor    /    Reais'].sum().nlargest(x)
-        df = df_serie.to_frame().sort_values(by='Fornecedor    /    Reais', ascending=False)
-        st.table(df.style.format('{:.2f}'))
+            df_gastos['Fornecedor    /    Reais'] = df_gastos['Reais']
+            df_serie = df_gastos.groupby(['nomeFornecedor'])['Fornecedor    /    Reais'].sum().nlargest(x)
+            df = df_serie.to_frame().sort_values(by='Fornecedor    /    Reais', ascending=False)
+            st.table(df.style.format('{:.2f}'))
        
-        st.subheader("Top "+str(x)+"--> Maiores qtdes de serviços prestados por fornecedor")
-        df_gastos['Fornecedor    /    Quantidade'] = df_gastos['nomeFornecedor']
+            st.subheader("Maiores qtdes de serviços prestados por fornecedor")
+            df_gastos['Fornecedor    /    Quantidade'] = df_gastos['nomeFornecedor']
         
-        st.table(df_gastos['Fornecedor    /    Quantidade'].value_counts().head(x))
+            st.table(df_gastos['Fornecedor    /    Quantidade'].value_counts().head(x))
  
-        if x > 9:
-            x = 9
-        else:
-            x = x
-        st.subheader("Top "+str(x)+"--> Maiores qtdes de serviços prestados por tipo de despesa")
-        df_gastos['Tipo Despesa    /    Quantidade'] = df_gastos['tipoDespesa']
+            if x > 9:
+                x = 9
+            else:
+                x = x
+            st.subheader("Maiores qtdes de serviços prestados por tipo de despesa")
+            df_gastos['Tipo Despesa    /    Quantidade'] = df_gastos['tipoDespesa']
 
-        st.table(df_gastos['Tipo Despesa    /    Quantidade'].value_counts().head(x))
+            st.table(df_gastos['Tipo Despesa    /    Quantidade'].value_counts().head(x))
         
         
    
-        st.sidebar.image(
+            st.sidebar.image(
                 "https://www.camara.leg.br/internet/deputado/bandep/"+str(id_dep).strip()+".jpg",
                 width=300
             )
         
         
-        #st.table(df_gastos[['dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']])
+            #st.table(df_gastos[['dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']])
 
-        bar = st.progress(0)
+            bar = st.progress(0)
         
-        for i in range(26):
-                bar.progress(i * 4)
-                #wait
-                time.sleep(0.2)
-
+            for i in range(26):
+                    bar.progress(i * 4)
+                    #wait
+                    time.sleep(0.2)
+        except:
+            st.write("Escolha um deputado")
 
     elif choice == 'About':
         #st.sidebar.image(about,caption="", width=300, height= 200)
