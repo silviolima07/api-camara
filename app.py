@@ -1,5 +1,7 @@
 import streamlit as st
 
+import streamlit.components.v1 as component
+
 from bokeh.models.widgets import Div
 
 import pandas as pd
@@ -166,7 +168,7 @@ def main():
 
     st.sidebar.image(camara,caption="", width=300)
 
-    activities = ["Home","Escolher Deputado","Top N Gastos","Legislaturas Pesquisadas","About"]
+    activities = ["Home","Escolher Deputado","Top N Gastos","Legislaturas Pesquisadas","Power BI","About"]
    
     choice = st.sidebar.selectbox("Selecione uma opção",activities)
 
@@ -438,7 +440,13 @@ def main():
                 #wait
                 time.sleep(0.2)
        
-
+    elif choice == 'Power BI':
+        if st.button("Abrir Análises do Power BI"):
+            js = "window.open('https://app.powerbi.com/view?r=eyJrIjoiYmMxZDc4MGItZWZhNy00MjA0LWJjNDItZjZkY2FhNzdmODJmIiwidCI6ImFmZmE4YzZlLWE1YTUtNDhjMS04MjYxLWU0MDZmZWE3YmNiNiJ9&pageName=ReportSection761d603990a69877300f')"
+            html = '<img src onerror="{}">'.format(js)
+            div = Div(text=html)
+            st.bokeh_chart(div)
+        
     elif choice == 'About':
         #st.sidebar.image(about,caption="", width=300, height= 200)
         st.subheader("Built with Streamlit")
@@ -457,13 +465,13 @@ def main():
         st.write("-> SERVIÇOS POSTAIS")
         st.write("-> TELEFONIA")
         
-        st.subheader("by Silvio Lima")
+        st.subheader("by Giovana/Claudio/Silvio Lima")
         
-        if st.button("Linkedin"):
-            js = "window.open('https://www.linkedin.com/in/silviocesarlima/')"
-            html = '<img src onerror="{}">'.format(js)
-            div = Div(text=html)
-            st.bokeh_chart(div)
+        #if st.button("Linkedin"):
+        #    js = "window.open('https://www.linkedin.com/in/silviocesarlima/')"
+        #    html = '<img src onerror="{}">'.format(js)
+        #    div = Div(text=html)
+        #    st.bokeh_chart(div)
    
     
 
