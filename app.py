@@ -383,6 +383,8 @@ def main():
 
                 df_despesas['Total'] = df_despesas['Total'].astype(int)
 
+                df_despesas['Ano'] = df_despesas['Ano'].astype(int)
+
                 df_despesas02 = df_despesas[['Ano','nomeFornecedor','tipoDespesa','Total']]
                 #df_despesas02['Ano'] = df_despesas02['Ano'].astype(int)
 
