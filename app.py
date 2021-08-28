@@ -333,7 +333,8 @@ def main():
                 df_despesas['Mes'] = df_despesas['DateTime'].dt.month
                 df_despesas['Ano'] = df_despesas['DateTime'].dt.year
                 df_despesas['Ano'] = df_despesas['Ano'].replace(".0",'')
-                df_despesas['Ano2'] = df_despesas['Ano'].astype(int)
+
+                df_despesas['Ano'] = df_despesas['Ano'].astype(str)
                 
                 df_despesas['Ano/Mes'] = df_despesas['DateTime'].dt.strftime('%Y/%m')
      
@@ -382,7 +383,7 @@ def main():
                 df_despesas['Total'] = df_despesas['Total'].astype(int)
 
                 df_despesas02 = df_despesas[['Ano','nomeFornecedor','tipoDespesa','Total']]
-                df_despesas02['Ano'] = df_despesas02['Ano'].astype(int)
+                #df_despesas02['Ano'] = df_despesas02['Ano'].astype(int)
 
                 #df_despesas['Count'] = df_despesas.groupby(['Ano','nomeFornecedor','tipoDespesa'])["nomeFornecedor"].transform('count')
           
