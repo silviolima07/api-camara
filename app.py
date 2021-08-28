@@ -8,7 +8,7 @@ import pandas as pd
 
 from PIL import Image
 
-pd.set_option('precision',2)
+pd.set_option('precision',0)
 
 import base64
 
@@ -335,6 +335,7 @@ def main():
                 df_despesas['Ano'] = df_despesas['Ano'].replace(".0",'')
 
                 df_despesas['Ano'] = df_despesas['Ano'].astype(str)
+                df_despesas['Ano'] = df_despesas['Ano'][:-2]
                 
                 df_despesas['Ano/Mes'] = df_despesas['DateTime'].dt.strftime('%Y/%m')
      
