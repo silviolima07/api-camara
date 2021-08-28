@@ -333,6 +333,7 @@ def main():
                 df_despesas['Mes'] = df_despesas['DateTime'].dt.month
                 df_despesas['Ano'] = df_despesas['DateTime'].dt.year
                 df_despesas['Ano'] = df_despesas['Ano'].replace(".0",'')
+                df_despesas['Ano'] = df_despesas['Ano'].astype(int)
                 
                 df_despesas['Ano/Mes'] = df_despesas['DateTime'].dt.strftime('%Y/%m')
      
