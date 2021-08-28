@@ -335,7 +335,7 @@ def main():
                 df_despesas['Ano'] = df_despesas['Ano'].replace(".0",'')
 
                 df_despesas['Ano'] = df_despesas['Ano'].astype(str)
-                df_despesas['Ano'] = df_despesas['Ano'][:-2]
+                df_despesas['Ano'] = df_despesas['Ano'].replace(".0",'')
                 
                 df_despesas['Ano/Mes'] = df_despesas['DateTime'].dt.strftime('%Y/%m')
      
@@ -402,7 +402,7 @@ def main():
                 print("df_despesas:", df_despesas02[['Ano','nomeFornecedor','tipoDespesa', 'Total']])
                 
                 st.write("Total de declarações de gastos agrupadas em todos mandatos: "+str(total_declaracoes))
-                st.table(df_despesas02)
+                st.table(df_despesas02[['Ano','nomeFornecedor','tipoDespesa', 'Total']])
                 #st.table(aggr_reais)
                 #print(df_despesas_aggr[['Ano',        'nomeFornecedor','tipoDespesa','valorLiquido','Reais']])
             
