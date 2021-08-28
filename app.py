@@ -22,9 +22,21 @@ import time
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
 
+import unicodedata
+
 @st.cache(suppress_st_warning=False) 
 
 
+
+def remove_accents(input_str):
+    try:
+        text = unicode(text, 'utf-8')
+    except (TypeError, NameError): # unicode is a default on python 3 
+        pass
+    text = unicodedata.normalize('NFD', input_str)
+    text = text.encode('ascii', 'ignore')
+    text = text.decode("utf-8")
+    return str(text)
 
 
 def get_table_download_link(df):
@@ -320,13 +332,37 @@ def main():
                 df_despesas['Dia'] = df_despesas['DateTime'].dt.day
                 df_despesas['Mes'] = df_despesas['DateTime'].dt.month
                 df_despesas['Ano'] = df_despesas['DateTime'].dt.year
+                df_despesas['Ano'] = df_despesas['Ano'].replace(".0",'')
                 
-                df_despesas['Ano-Mes'] = df_despesas['DateTime'].dt.strftime('%Y-%m')
-                
-                temp[['id_dep','nome','Ano-Mes','dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']].to_csv("/tmp/gastos.csv") 
+                df_despesas['Ano/Mes'] = df_despesas['DateTime'].dt.strftime('%Y/%m')
+     
+                df_despesas['nomeFornecedor'] = (df_despesas['nomeFornecedor']).str.upper()
+                df_despesas['tipoDespesa'] = (df_despesas['tipoDespesa']).str.upper()
+                df_despesas['nomeFornecedor'] = (df_despesas['nomeFornecedor']).str.strip()
+                df_despesas['tipoDespesa'] = (df_despesas['tipoDespesa']).str.strip()
+                df_despesas['nomeFornecedor'] = df_despesas['nomeFornecedor'].replace(".",'')
+                df_despesas['tipoDespesa'] = df_despesas['tipoDespesa'].replace(".",'')
 
-                total_declaracoes = df_despesas.shape[0]
-                df_despesas['Reais'] = df_despesas['valorLiquido']
+                tipo=[]
+                for i in df_despesas['tipoDespesa']:
+                   #print(i)
+                   tipo.append(remove_accents(i))
+                #print(tipo)
+                df_despesas['tipoDespesa'] = tipo
+
+                tipo=[]
+                for i in df_despesas['nomeFornecedor']:
+                   #print(i)
+                   tipo.append(remove_accents(i))
+                #print(tipo)
+                df_despesas['nomeFornecedor'] = tipo
+                
+                temp[['id_dep','nome','Ano/Mes','dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']].to_csv("/tmp/gastos.csv") 
+
+                
+                df_despesas['valorLiquido'] = df_despesas['valorLiquido'].fillna(0)
+                #print("Valor Liquido:", df_despesas['valorLiquido'])
+                df_despesas['Reais'] = df_despesas['valorLiquido'].astype(float)
 
                            
                 #df_despesas['dataDocumento']= pd.to_datetime(df_despesas['dataDocumento'],format='%Y-%m-%d')
@@ -334,10 +370,37 @@ def main():
 
                 #st.table(df_despesas['Ano-Mes'])
                 #print("Ano:", str(df_despesas['Ano']).split('.')[0])
+                #print(df_despesas.columns)
+
+                #aggr_reais = df_despesas.groupby(['Ano','nomeFornecedor', 'tipoDespesa']).agg({'Reais':'sum'})
+                #print("aggr_reais:", aggr_reais.columns)
                
+                df_despesas['Total'] = df_despesas.groupby(['Ano','nomeFornecedor','tipoDespesa'])["Reais"].transform('sum')
+                df_despesas['Total'] = df_despesas['Total'].fillna(0)
+
+                df_despesas['Total'] = df_despesas['Total'].astype(int)
+
+                df_despesas02 = df_despesas[['Ano','nomeFornecedor','tipoDespesa','Total']]
+
+                #df_despesas['Count'] = df_despesas.groupby(['Ano','nomeFornecedor','tipoDespesa'])["nomeFornecedor"].transform('count')
+          
+                #print("Count:", df_despesas)
+
+                df_despesas02.dropna(inplace=True)
+               
+                df_despesas02.drop_duplicates(inplace=True)
+           
                 
-                st.write("Total de declarações de gasto em todos mandatos: "+str(total_declaracoes))
-                st.table(df_despesas[['dataDocumento',        'nomeFornecedor','tipoDespesa','Reais']])
+               
+                total_declaracoes = df_despesas02.shape[0]
+                print("Total declarações de gastos:", total_declaracoes)        
+   
+                print("df_despesas:", df_despesas02[['Ano','nomeFornecedor','tipoDespesa', 'Total']])
+                
+                st.write("Total de declarações de gastos agrupadas em todos mandatos: "+str(total_declaracoes))
+                st.table(df_despesas02)
+                #st.table(aggr_reais)
+                #print(df_despesas_aggr[['Ano',        'nomeFornecedor','tipoDespesa','valorLiquido','Reais']])
             
                 bar = st.progress(0)
         
@@ -349,7 +412,7 @@ def main():
                 #st.markdown(get_table_download_link(df_despesas), unsafe_allow_html=True)
                 #download_link(df, texto1, texto2)
                 nome = dep_escolhido.replace(' ','-')+".csv"
-                st.markdown(download_link(df_despesas[['dataDocumento',        'nomeFornecedor','tipoDespesa','Reais']], nome, nome), unsafe_allow_html=True)
+                st.markdown(download_link(df_despesas02[['Ano','nomeFornecedor','tipoDespesa','Total']], nome, nome), unsafe_allow_html=True)
         
             else:
                 st.write("Sem dados informados")
@@ -401,17 +464,17 @@ def main():
             
         st.subheader("Maiores despesas por tipo")  
         
-        df_gastos['Tipo Despesa    /    Reais'] = df_gastos['Reais']
+        df_gastos['Tipo Despesa    /    Reais'] = df_gastos['Reais'].astype(int)
         df_serie = df_gastos.groupby(['tipoDespesa'])['Tipo Despesa    /    Reais'].sum().nlargest(x)
         df = df_serie.to_frame().sort_values(by='Tipo Despesa    /    Reais', ascending=False)
-        st.table(df.style.format('{:.2f}'))
+        st.table(df.style.format('{:.0f}'))
         
         st.subheader("Maiores despesas por fornecedores")
         
-        df_gastos['Fornecedor    /    Reais'] = df_gastos['Reais']
+        df_gastos['Fornecedor    /    Reais'] = df_gastos['Reais'].astype(int)
         df_serie = df_gastos.groupby(['nomeFornecedor'])['Fornecedor    /    Reais'].sum().nlargest(x)
         df = df_serie.to_frame().sort_values(by='Fornecedor    /    Reais', ascending=False)
-        st.table(df.style.format('{:.2f}'))
+        st.table(df.style.format('{:.0f}'))
        
         st.subheader("Maiores qtdes de serviços prestados por fornecedor")
         df_gastos['Fornecedor    /    Quantidade'] = df_gastos['nomeFornecedor']
