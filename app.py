@@ -353,12 +353,13 @@ def main():
                 #print(tipo)
                 df_despesas['tipoDespesa'] = tipo
 
-                tipo=[]
+                nomeForn =[]
                 for i in df_despesas['nomeFornecedor']:
-                   #print(i)
-                   tipo.append(remove_accents(i))
-                #print(tipo)
-                df_despesas['nomeFornecedor'] = tipo
+                    #print(i)
+                    tempfor = remove_accents(i)
+                    tempfor2 = tempfor.replace(".",'')
+                    nomeForn.append(tempfor2)
+                df_despesas['nomeFornecedor'] = nomeForn
                 
                 temp[['id_dep','nome','Ano/Mes','dataDocumento',        'nomeFornecedor','tipoDespesa','valorLiquido']].to_csv("/tmp/gastos.csv") 
 
@@ -378,16 +379,26 @@ def main():
                 #aggr_reais = df_despesas.groupby(['Ano','nomeFornecedor', 'tipoDespesa']).agg({'Reais':'sum'})
                 #print("aggr_reais:", aggr_reais.columns)
                
-                df_despesas['Total'] = df_despesas.groupby(['Ano','nomeFornecedor','tipoDespesa'])["Reais"].transform('sum')
-                df_despesas['Total'] = df_despesas['Total'].fillna(0)
+                df_despesas['Total R$'] = df_despesas.groupby(['Ano','nomeFornecedor','tipoDespesa'])["Reais"].transform('sum')
+                df_despesas['Total R$'] = df_despesas['Total R$'].fillna(0)
 
-                df_despesas['Total'] = df_despesas['Total'].astype(int)
+                total=[]
+                for i in df_despesas['Total R$']:
+                   temp = str(i)
+                   temp = temp.split('.')[0]
+                   total.append(temp) 
+                df_despesas['Total R$'] = total
+                
+                ano = []
+                for i in df_despesas['Ano']:
+                    temp = str(i)
+                    temp = temp.replace(".0", "")
+                    ano.append(temp)
+                df_despesas["Ano"] = ano
 
-                df_despesas['Ano'] = df_despesas['Ano'].fillna(0)
+                print("df_despesas:", df_despesas)
 
-                df_despesas['Ano'] = df_despesas['Ano'].astype(int)
-
-                df_despesas02 = df_despesas[['Ano','nomeFornecedor','tipoDespesa','Total']]
+                df_despesas02 = df_despesas[['Ano','nomeFornecedor','tipoDespesa','Total R$']]
                 #df_despesas02['Ano'] = df_despesas02['Ano'].astype(int)
 
                 #df_despesas['Count'] = df_despesas.groupby(['Ano','nomeFornecedor','tipoDespesa'])["nomeFornecedor"].transform('count')
@@ -401,12 +412,12 @@ def main():
                 
                
                 total_declaracoes = df_despesas02.shape[0]
-                print("Total declarações de gastos:", total_declaracoes)        
+                #print("Total declarações de gastos:", total_declaracoes)        
    
-                print("df_despesas:", df_despesas02[['Ano','nomeFornecedor','tipoDespesa', 'Total']])
+                #print("df_despesas:", df_despesas02[['Ano','nomeFornecedor','tipoDespesa', 'Total']])
                 
                 st.write("Total de declarações de gastos agrupadas em todos mandatos: "+str(total_declaracoes))
-                st.table(df_despesas02[['Ano','nomeFornecedor','tipoDespesa', 'Total']])
+                st.table(df_despesas02[['Ano','nomeFornecedor','tipoDespesa', 'Total R$']])
                 #st.table(aggr_reais)
                 #print(df_despesas_aggr[['Ano',        'nomeFornecedor','tipoDespesa','valorLiquido','Reais']])
             
@@ -420,7 +431,7 @@ def main():
                 #st.markdown(get_table_download_link(df_despesas), unsafe_allow_html=True)
                 #download_link(df, texto1, texto2)
                 nome = dep_escolhido.replace(' ','-')+".csv"
-                st.markdown(download_link(df_despesas02[['Ano','nomeFornecedor','tipoDespesa','Total']], nome, nome), unsafe_allow_html=True)
+                st.markdown(download_link(df_despesas02[['Ano','nomeFornecedor','tipoDespesa','Total R$']], nome, nome), unsafe_allow_html=True)
         
             else:
                 st.write("Sem dados informados")
