@@ -6,6 +6,8 @@ from bokeh.models.widgets import Div
 
 import pandas as pd
 
+import numpy as np
+
 from PIL import Image
 
 pd.set_option('precision',0)
@@ -412,11 +414,12 @@ def main():
                 
                
                 total_declaracoes = df_despesas02.shape[0]
-                #print("Total declarações de gastos:", total_declaracoes)        
+                #print("Total declarações de gastos:", df_despesas02.shape)        
    
                 #print("df_despesas:", df_despesas02[['Ano','nomeFornecedor','tipoDespesa', 'Total']])
                 
-                st.write("Total de declarações de gastos agrupadas em todos mandatos: "+str(total_declaracoes))
+                st.subheader("Declarações de gastos")
+                st.write("Agrupadas por: ano, fornecedor e tipo de despesa: ")
                 st.table(df_despesas02[['Ano','nomeFornecedor','tipoDespesa', 'Total R$']])
                 #st.table(aggr_reais)
                 #print(df_despesas_aggr[['Ano',        'nomeFornecedor','tipoDespesa','valorLiquido','Reais']])
@@ -433,6 +436,41 @@ def main():
                 nome = dep_escolhido.replace(' ','-')+".csv"
                 st.markdown(download_link(df_despesas02[['Ano','nomeFornecedor','tipoDespesa','Total R$']], nome, nome), unsafe_allow_html=True)
         
+                #st.header("Aplicando agrupamento")
+
+                #st.subheader("Basic Math")
+                #df_despesas02['Total Reais'] = pd.to_numeric(df_despesas02['Total R$'])
+
+                #agg_func_describe = {'Total Reais': ['sum', 'median', 'std']}
+                #df_math = df_despesas02.groupby(['tipoDespesa']).agg(agg_func_describe)
+                #st.write(df_math)
+                
+                 
+                #st.subheader("Selection - Min Max")
+                #agg_func_selection = {'Total Reais': [np.min, np.max]}
+                #df_selection = df_despesas02.groupby(['tipoDespesa']).agg(agg_func_selection)
+                #print("Columns", df_selection.columns)
+                #df_selection.rename(columns={'Total Reais amin':'Valor Minimo', 'Total Reais amax':'Valor Maximo'})
+                #df_selection = df_selection.rename(columns={'amin': 'Minimo', 'amax': 'Maximo'})
+                #df_selection.index.set_names(["Valor Minimo", "Valor Maximo"], inplace=True)
+                #st.write(df_selection)
+
+                #################
+
+                #df_idxmax = df_despesas02.loc[df_despesas02.reset_index().groupby(['nomeFornecedor'])['Total Reais'].idxmax()]
+
+                #df_idxmax = df_despesas02.loc[df_despesas02.reset_index().groupby(['nomeFornecedor'])['Total R$'].idxmax()]
+
+                
+                #df_idxmax = df_despesas02.groupby(level=0).apply(lambda group: group.nlargest(1, columns='Total Reais')).reset_index(level=-1, drop=True)
+                #st.table(df_idxmax)
+
+                #from scipy.stats import mode
+                #st.subheader("Mode")
+                #agg_func_stats = {'Total Reais': [mode, pd.Series.mode]}
+                #df_stat = df_despesas02.groupby(['tipoDespesa']).agg(agg_func_stats)
+                #st.table(df_stat)
+                
             else:
                 st.write("Sem dados informados")
        
@@ -523,8 +561,9 @@ def main():
                 time.sleep(0.2)
        
     elif choice == 'Power BI':
-        if st.button("Abrir Análises do Power BI"):
-            js = "window.open('https://app.powerbi.com/view?r=eyJrIjoiYmMxZDc4MGItZWZhNy00MjA0LWJjNDItZjZkY2FhNzdmODJmIiwidCI6ImFmZmE4YzZlLWE1YTUtNDhjMS04MjYxLWU0MDZmZWE3YmNiNiJ9&pageName=ReportSection761d603990a69877300f')"
+        if st.button("Abrir análises usando Power BI"):
+            #js = "window.open('https://app.powerbi.com/view?r=eyJrIjoiYm#MxZDc4MGItZWZhNy00MjA0LWJjNDItZjZkY2FhNzdmODJmIiwidCI6ImFmZmE4YzZlLWE1YTUtNDhjMS04MjYxLWU0MDZmZWE3YmNiNiJ9&pageName=ReportSection761d603990a69877300f')"
+            js = "window.open('https://app.powerbi.com/view?r=eyJrIjoiMTc4ZGI2NmEtOTkzZi00ODhmLWE5ODQtMjAwZDFhYWFmODkyIiwidCI6IjQwZjQ2YmVkLWNjZTItNGVkMi04YzQ5LTRhYzU5M2M1MDcwOCJ9&pageName=ReportSectiona55da1d5c48609dc6067')"
             html = '<img src onerror="{}">'.format(js)
             div = Div(text=html)
             st.bokeh_chart(div)
@@ -535,19 +574,21 @@ def main():
         
         st.write("Dados coletados via API da Camara de Deputados do Brasil.")
         st.write("https://dadosabertos.camara.leg.br/swagger/api.html")
+        #st.subheader("Observação")
+        #st.write("-> Foram feitos tratamentos diferentes nas bases de gastos, isso pode explicar diferenças em valores citados de alguns parlamentares.")
         
-        st.subheader("9 Tipos de Despesas:")
-        st.write("-> MANUTENÇÃO DE ESCRITÓRIO DE APOIO À ATIVIDADE PARLAMENTAR")
-        st.write("-> AQUISIÇÃO OU LOC. DE SOFTWARE; SERV. POSTAIS; ASS.")
-        st.write("-> DIVULGAÇÃO DA ATIVIDADE PARLAMENTAR")
-        st.write("-> AQUISIÇÃO DE MATERIAL DE ESCRITÓRIO")
-        st.write("-> COMBUSTÍVEIS E LUBRIFICANTES")
-        st.write("-> PASSAGEM AÉREA - REEMBOLSO")
-        st.write("-> PASSAGEM AÉREA - RPA")
-        st.write("-> SERVIÇOS POSTAIS")
-        st.write("-> TELEFONIA")
+        #st.subheader("9 Tipos de Despesas:")
+        #st.write("-> MANUTENÇÃO DE ESCRITÓRIO DE APOIO À ATIVIDADE PARLAMENTAR")
+        #st.write("-> AQUISIÇÃO OU LOC. DE SOFTWARE; SERV. POSTAIS; ASS.")
+        #st.write("-> DIVULGAÇÃO DA ATIVIDADE PARLAMENTAR")
+        #st.write("-> AQUISIÇÃO DE MATERIAL DE ESCRITÓRIO")
+        #st.write("-> COMBUSTÍVEIS E LUBRIFICANTES")
+        #st.write("-> PASSAGEM AÉREA - REEMBOLSO")
+        #st.write("-> PASSAGEM AÉREA - RPA")
+        #st.write("-> SERVIÇOS POSTAIS")
+        #st.write("-> TELEFONIA")
         
-        st.subheader("by Giovana/Claudio/Silvio Lima")
+        st.subheader("by Giovana Titoto / Claudio Soares / Silvio Lima")
         
         #if st.button("Linkedin"):
         #    js = "window.open('https://www.linkedin.com/in/silviocesarlima/')"
