@@ -574,8 +574,9 @@ def main():
         
         st.write("Dados coletados via API da Camara de Deputados do Brasil.")
         st.write("https://dadosabertos.camara.leg.br/swagger/api.html")
-        #st.subheader("Observação")
-        #st.write("-> Foram feitos tratamentos diferentes nas bases de gastos, isso pode explicar diferenças em valores citados de alguns parlamentares.")
+        st.subheader("Observação")
+        st.write("-> Foram feitos tratamentos diferentes nas bases de gastos."
+        st.write("-> Isso explica a diferença de valores apresentados no app e no Power BI")
         
         #st.subheader("9 Tipos de Despesas:")
         #st.write("-> MANUTENÇÃO DE ESCRITÓRIO DE APOIO À ATIVIDADE PARLAMENTAR")
