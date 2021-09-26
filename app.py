@@ -158,17 +158,17 @@ def main():
     # Titulo do web app
     html_page = """
     <div style="background-color:blue;padding=30px">
-        <p style='text-align:center;font-size:30px;font-weight:bold;color:white'>Camara de Deputados</p>
+        <p style='text-align:center;font-size:30px;font-weight:bold;color:white'>Análise dos Gastos Declarados</p>
     </div>
               """
     st.markdown(html_page, unsafe_allow_html=True)
    
-    html_page = """
-    <div style="background-color:white;padding=20px">
-        <p style='text-align:center;font-size:20px;font-weight:bold;color:blue'>Dados sobre Despesas</p>
-    </div>
-              """
-    st.markdown(html_page, unsafe_allow_html=True)
+    #html_page = """
+    #<div style="background-color:white;padding=20px">
+    #    <p style='text-align:center;font-size:18px;font-weight:bold;color:blue'>Nas legislaturas onde foi Eleito </p>
+    #</div>
+    #          """
+    #st.markdown(html_page, unsafe_allow_html=True)
 
 
     anos = ['2007','2008','2009','2010', '2011', '2012','2013', '2014', '2015', 
@@ -287,8 +287,11 @@ def main():
             deputado['Partido'] = deputado['siglaPartido']
             deputado['Uf'] = deputado['siglaUf']
             deputado.set_index('Legislatura', inplace=True)
+            total_mandatos = str(deputado.shape[0])
             
-            st.sidebar.write("Mandatos legislativos eleitos")
+            
+            st.sidebar.write("Mandatos legislativos exercidos") 
+           
 
             st.sidebar.table(deputado[['Partido','Uf']])
 
@@ -419,6 +422,7 @@ def main():
                 #print("df_despesas:", df_despesas02[['Ano','nomeFornecedor','tipoDespesa', 'Total']])
                 
                 st.subheader("Declarações de gastos")
+                st.write("Mandatos: "+total_mandatos)
                 st.write("Agrupadas por: ano, fornecedor e tipo de despesa: ")
                 st.table(df_despesas02[['Ano','nomeFornecedor','tipoDespesa', 'Total R$']])
                 #st.table(aggr_reais)
