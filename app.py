@@ -10,6 +10,8 @@ import numpy as np
 
 from PIL import Image
 
+import altair as alt
+
 pd.set_option('precision',0)
 
 import base64
@@ -180,6 +182,8 @@ def main():
     
     dados_abertos  = Image.open("Images/dados_abertos.jpeg")
 
+    pbi = Image.open("Images/PBI.png")
+
     st.sidebar.image(camara,caption="", width=300)
 
     activities = ["Home","Escolher Deputado","Top N Gastos","Legislaturas Pesquisadas","Power BI","About"]
@@ -341,6 +345,8 @@ def main():
 
                 df_despesas['Ano'] = df_despesas['Ano'].astype(str)
                 df_despesas['Ano'] = df_despesas['Ano'].replace(".0",'')
+                df_despesas['Ano'] = df_despesas['Ano'].replace("nan",'2019')
+                
                 
                 df_despesas['Ano/Mes'] = df_despesas['DateTime'].dt.strftime('%Y/%m')
      
@@ -439,8 +445,89 @@ def main():
                 #download_link(df, texto1, texto2)
                 nome = dep_escolhido.replace(' ','-')+".csv"
                 st.markdown(download_link(df_despesas02[['Ano','nomeFornecedor','tipoDespesa','Total R$']], nome, nome), unsafe_allow_html=True)
-        
-                #st.header("Aplicando agrupamento")
+                
+                deputado = dep_escolhido
+                st.header(deputado)
+                st.subheader("Gráficos")
+                
+                #import seaborn as sns
+                
+                # Load the example tips dataset
+                data = df_despesas
+                data['Ano'] = data['Ano'].astype('int32')
+                data['Total R$'] = data['Total R$'].astype('float32')
+
+                y= data['Total R$']
+                x= data['Ano']
+
+                import matplotlib.pyplot as plt
+                plt.rcdefaults()
+                fig, ax = plt.subplots()
+                
+                ax.bar(x, y, align='center',color ='maroon')
+                
+                ax.set_ylabel('Total R$') 
+                ax.set_xlabel('Ano') 
+                ax.set_title('Total de Gastos por Ano')
+                plt.savefig('Images/plt.png')
+                plot = Image.open("Images/plt.png")
+                st.image(plot,caption="", width=700)
+                ############################################
+
+                fig1, ax1 = plt.subplots()
+                ax1.set_title('Boxplot das Despesas Listadas')
+                ax1.boxplot(data['Total R$'])
+                ax1.set_xlabel('Total R$') 
+                plt.savefig('Images/boxplot.png')
+                plot2 = Image.open("Images/boxplot.png")
+                st.image(plot2,caption="", width=700)
+
+                ##############################################
+
+                # Figure Size
+                #import matplotlib.pyplot as plt
+                #import numpy as np
+                #import seaborn as sns
+                #sns.countplot(y="Ano", hue = "nomeFornecedor", data=data)
+                
+                #st.write(data[['tipoDespesa', 'Total R$']].drop_duplicates())
+                #fig = plt.figure(figsize =(20, 8))
+                #plt.ylabel('Total R$',fontsize = 20) 
+                #plt.xlabel('Total Gasto',fontsize=12) 
+                #plt.title('Total de Gastos por Tipo de Despesa',fontsize = 20)
+                #plt.bar(data['tipoDespesa'], data['Total R$'],align='center',color ='maroon')
+                #plt.xticks(rotation=90)
+                #plt.legend(loc=4,prop={'size': 8})
+                #plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+                #plt.legend(bbox_to_anchor=(0,1.02,1,0.2), loc="lower left",
+                #mode="expand", borderaxespad=0, ncol=3)
+                #plt.legend(loc='#upper center', bbox_to_anchor=(0.5, -0.05),
+                #fancybox=True, shadow=True, ncol=5)
+                
+                # Show Plot
+                #plt.savefig('Images/plt_despesa.png')
+                #plot3 = Image.open("Images/plt_despesa.png")
+                #st.image(plot3,caption="", width=700)
+
+
+                #fig,ax = plt.subplots()
+                #ax.bar(data['tipoDespesa'], data['Total R$'],align='center',color ='maroon')
+                #x_legend = data['tipoDespesa']
+                #t = ax.text(.7,.2,x_legend)
+                #fig.subplots_adjust(right=.65)
+
+                
+                # Show Plot
+                #plt.savefig('Images/plt_despesa01.png')
+                #plot4 = Image.open("Images/plt_despesa01.png")
+                #st.image(plot4,caption="", width=700)
+ 
+                
+
+
+#######################################################3
+
+           
 
                 #st.subheader("Basic Math")
                 #df_despesas02['Total Reais'] = pd.to_numeric(df_despesas02['Total R$'])
@@ -566,12 +653,15 @@ def main():
        
     elif choice == 'Power BI':
         if st.button("Abrir análises usando Power BI"):
-            #js = "window.open('https://app.powerbi.com/view?r=eyJrIjoiYm#MxZDc4MGItZWZhNy00MjA0LWJjNDItZjZkY2FhNzdmODJmIiwidCI6ImFmZmE4YzZlLWE1YTUtNDhjMS04MjYxLWU0MDZmZWE3YmNiNiJ9&pageName=ReportSection761d603990a69877300f')"
-            js = "window.open('https://app.powerbi.com/view?r=eyJrIjoiMTc4ZGI2NmEtOTkzZi00ODhmLWE5ODQtMjAwZDFhYWFmODkyIiwidCI6IjQwZjQ2YmVkLWNjZTItNGVkMi04YzQ5LTRhYzU5M2M1MDcwOCJ9&pageName=ReportSectiona55da1d5c48609dc6067')"
+            js = "window.open('https://app.powerbi.com/view?r=eyJrIjoiZDJmYmIxYzMtNzkwYy00NTYxLTkzZTUtYTFmYTRiMTE4ZWNiIiwidCI6ImFmZmE4YzZlLWE1YTUtNDhjMS04MjYxLWU0MDZmZWE3YmNiNiJ9&pageName=ReportSectiona55da1d5c48609dc6067')"
+            #js = "window.open('https://app.powerbi.com/view?r=eyJrIjoiMTc4ZGI2NmEtOTkzZi00ODhmLWE5ODQtMjAwZDFhYWFmODkyIiwidCI6IjQwZjQ2YmVkLWNjZTItNGVkMi04YzQ5LTRhYzU5M2M1MDcwOCJ9&pageName=ReportSectiona55da1d5c48609dc6067')"
+            #js = "window.open('https://app.powerbi.com/view?r=eyJrIjoiZDJmYmIxYzMtNzkwYy00NTYxLTkzZTUtYTFmYTRiMTE4ZWNiIiwidCI6ImFmZmE4YzZlLWE1YTUtNDhjMS04MjYxLWU0MDZmZWE3YmNiNiJ9&pageName=ReportSectiona55da1d5c48609dc6067')"
             html = '<img src onerror="{}">'.format(js)
             div = Div(text=html)
             st.bokeh_chart(div)
         
+        st.image(pbi,caption="", width=700)
+
     elif choice == 'About':
         #st.sidebar.image(about,caption="", width=300, height= 200)
         st.subheader("Built with Streamlit")
