@@ -311,7 +311,7 @@ def main():
            'urlDocumento','valorDocumento','valorGlosa','valorLiquido'] 
 
             st.subheader("Gastos")
-            st.text("Coletando dados via API na Camara de deputados, aguarde terminar...")
+            st.text("Coletando dados via API na Câmara de deputados, aguarde terminar...")
             st.text("-> https://dadosabertos.camara.leg.br/api/v2/deputados/idDep/despesas?idLegislatura")
 
             df_desp = trazer_dados_desp(URL_desp,id_dep, coluna_desp)
@@ -431,9 +431,14 @@ def main():
    
                 #print("df_despesas:", df_despesas02[['Ano','nomeFornecedor','tipoDespesa', 'Total']])
                 
-                st.subheader("Declarações de gastos")
+                st.subheader("Relação de Gastos Declarados")
+                st.write("Declarações agrupadas por: ano, fornecedor e tipo de despesa: ")
                 st.write("Mandatos: "+total_mandatos)
-                st.write("Agrupadas por: ano, fornecedor e tipo de despesa: ")
+                set_ano = set(list(df_despesas["Ano"].drop_duplicates()))
+                total_anos = len(set_ano)
+                st.text("Anos: "+str(total_anos))
+                st.text(str(set_ano))
+                
                 st.table(df_despesas02[['Ano','nomeFornecedor','tipoDespesa', 'Total R$']])
                 #st.table(aggr_reais)
                 #print(df_despesas_aggr[['Ano',        'nomeFornecedor','tipoDespesa','valorLiquido','Reais']])
@@ -452,7 +457,10 @@ def main():
                 
                 deputado = dep_escolhido
                 st.header(deputado)
-                st.subheader("Gráficos")
+                st.write()
+                st.subheader("Evolução dos gastos ao longo dos anos de mandato")
+                
+                st.write()
                 
                 #import seaborn as sns
                 
@@ -477,8 +485,11 @@ def main():
                 #plot = Image.open("Images/plt.png")
                 #st.image(plot,caption="", width=700)
                 st.pyplot(fig)
-
+                st.write()
                 ############################################
+
+                st.subheader("Identificação do gasto médio e valores outliers")
+                st.write()
 
                 fig1, ax1 = plt.subplots()
                 ax1.set_title('Boxplot das Despesas Listadas')
@@ -616,21 +627,21 @@ def main():
         x = st.sidebar.slider('Top-N Gastos', min_value = 1, max_value=7, value = 3 )
         st.markdown("# Top "+str(x))
             
-        st.subheader("Maiores despesas por tipo")  
+        st.subheader("Maiores despesas agrupadas por tipo")  
         
         df_gastos['Tipo Despesa    /    Reais'] = df_gastos['Reais'].astype(int)
         df_serie = df_gastos.groupby(['tipoDespesa'])['Tipo Despesa    /    Reais'].sum().nlargest(x)
         df = df_serie.to_frame().sort_values(by='Tipo Despesa    /    Reais', ascending=False)
         st.table(df.style.format('{:.0f}'))
         
-        st.subheader("Maiores despesas por fornecedores")
+        st.subheader("Maiores despesas agrupadas por fornecedores")
         
         df_gastos['Fornecedor    /    Reais'] = df_gastos['Reais'].astype(int)
         df_serie = df_gastos.groupby(['nomeFornecedor'])['Fornecedor    /    Reais'].sum().nlargest(x)
         df = df_serie.to_frame().sort_values(by='Fornecedor    /    Reais', ascending=False)
         st.table(df.style.format('{:.0f}'))
        
-        st.subheader("Maiores qtdes de serviços prestados por fornecedor")
+        st.subheader("Maiores qtdes de serviços prestados agrupadas por fornecedor")
         df_gastos['Fornecedor    /    Quantidade'] = df_gastos['nomeFornecedor']
         
         st.table(df_gastos['Fornecedor    /    Quantidade'].value_counts().head(x))
@@ -675,19 +686,11 @@ def main():
         st.write("Dados coletados via API da Camara de Deputados do Brasil.")
         st.write("https://dadosabertos.camara.leg.br/swagger/api.html")
         st.subheader("Observação")
-        st.write("-> Foram feitos tratamentos diferentes nas bases de gastos.")
-        st.write("-> Isso explica a diferença de valores apresentados no app e no Power BI")
-        
-        #st.subheader("9 Tipos de Despesas:")
-        #st.write("-> MANUTENÇÃO DE ESCRITÓRIO DE APOIO À ATIVIDADE PARLAMENTAR")
-        #st.write("-> AQUISIÇÃO OU LOC. DE SOFTWARE; SERV. POSTAIS; ASS.")
-        #st.write("-> DIVULGAÇÃO DA ATIVIDADE PARLAMENTAR")
-        #st.write("-> AQUISIÇÃO DE MATERIAL DE ESCRITÓRIO")
-        #st.write("-> COMBUSTÍVEIS E LUBRIFICANTES")
-        #st.write("-> PASSAGEM AÉREA - REEMBOLSO")
-        #st.write("-> PASSAGEM AÉREA - RPA")
-        #st.write("-> SERVIÇOS POSTAIS")
-        #st.write("-> TELEFONIA")
+        st.write("Foram feitos tratamentos diferentes nas bases de gastos.")
+        st.write("No PBI analisou-se os dados no periodo de 10 anos, de 2009 a 2019.")
+        st.write("Enquanto que no app foram analisados dados trazidos pela API por legislatura.")
+        st.write("Cada legislatura compreende 4 anos. Atualmente estamos na legislatura 56, que termina em 31/01/2023.")
+        st.write("Isso explica a diferença de alguns valores apresentados no app e no Power BI.")
         
         st.subheader("by Giovana Titoto / Claudio Soares / Silvio Lima")
         
