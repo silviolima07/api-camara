@@ -473,20 +473,20 @@ def main():
                 ax.set_ylabel('Total R$') 
                 ax.set_xlabel('Ano') 
                 ax.set_title('Total de Gastos por Ano')
-                plt.savefig('Images/plt.png')
-                plot = Image.open("Images/plt.png")
-                st.image(plot,caption="", width=700)
-                #st.pyplot()
+                #plt.savefig('Images/plt.png')
+                #plot = Image.open("Images/plt.png")
+                #st.image(plot,caption="", width=700)
+                st.pyplot()
                 ############################################
 
                 fig1, ax1 = plt.subplots()
                 ax1.set_title('Boxplot das Despesas Listadas')
                 ax1.boxplot(data['Total R$'])
                 ax1.set_xlabel('Total R$') 
-                plt.savefig('Images/boxplot.png')
-                plot2 = Image.open("Images/boxplot.png")
-                st.image(plot2,caption="", width=700)
-
+                #plt.savefig('Images/boxplot.png')
+                #plot2 = Image.open("Images/boxplot.png")
+                #st.image(plot2,caption="", width=700)
+                st.pyplot()
                 ##############################################
 
                 # Figure Size
