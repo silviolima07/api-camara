@@ -260,11 +260,11 @@ def main():
 
     if choice == activities[0]:
        
-        col1,col2 = st.columns(2)
+        #col1,col2 = st.columns(2)
     
        
         #col1.header("Câmara de Deputados")
-        col1.image(dados_abertos, width=700)
+        st.image(dados_abertos, width=700)
         
    
 
@@ -476,7 +476,8 @@ def main():
                 #plt.savefig('Images/plt.png')
                 #plot = Image.open("Images/plt.png")
                 #st.image(plot,caption="", width=700)
-                st.pyplot()
+                st.pyplot(fig)
+
                 ############################################
 
                 fig1, ax1 = plt.subplots()
@@ -486,7 +487,7 @@ def main():
                 #plt.savefig('Images/boxplot.png')
                 #plot2 = Image.open("Images/boxplot.png")
                 #st.image(plot2,caption="", width=700)
-                st.pyplot()
+                st.pyplot(fig1)
                 ##############################################
 
                 # Figure Size
