@@ -23,6 +23,8 @@ import pandas as pd
 
 import time
 
+import matplotlib
+
 import matplotlib.pyplot as plt
 
 import warnings
