@@ -474,6 +474,7 @@ def main():
                 plt.savefig('Images/plt.png')
                 plot = Image.open("Images/plt.png")
                 st.image(plot,caption="", width=700)
+                #st.pyplot()
                 ############################################
 
                 fig1, ax1 = plt.subplots()
