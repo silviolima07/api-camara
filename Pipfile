@@ -7,6 +7,9 @@ verify_ssl = true
 
 [packages]
 bokeh = "*"
+matplotlib = "*"
+streamlit = "*"
+altair = "*"
 
 [requires]
 python_version = "3.6"
