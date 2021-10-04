@@ -23,6 +23,8 @@ import pandas as pd
 
 import time
 
+import matplotlib.pyplot as plt
+
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
 
@@ -460,7 +462,7 @@ def main():
                 y= data['Total R$']
                 x= data['Ano']
 
-                import matplotlib.pyplot as plt
+                
                 plt.rcdefaults()
                 fig, ax = plt.subplots()
                 
